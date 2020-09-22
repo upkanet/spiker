@@ -122,8 +122,8 @@ class MEARecord {
         });
         var eMax = [];
         for(var i = 0; i < aMax.length; i++){
-            //eMax[i] = aMax[this.epos[i]];
-            eMax[this.epos[i]] = aMax[i];
+            eMax[i] = aMax[this.epos[i]];
+            //eMax[this.epos[i]] = aMax[i];
         }
         return eMax;
     }

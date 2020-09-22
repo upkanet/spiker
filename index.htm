@@ -9,6 +9,7 @@
     function loadHM() {
         $.getJSON('/emax', function (data) {
             console.log(data);
+            data = cutMax(0.01,data);
             var d = { z: squadredArr(data), type: 'heatmap' };
             Plotly.newPlot('heatmap', [d]);
         });
@@ -20,6 +21,22 @@
             var d = { y: data.map(x => -x), type: 'line' };
             Plotly.newPlot('gElectrode', [d]);
         });
+    }
+
+    function cutMax(threshold, data) {
+        var data2 = data;
+        var m = 0;
+        var p = 0;
+        for (var i = 0; i < data.length; i++) {
+            m = Math.max(data[i], m);
+            if (m == data[i]) {
+                p = i;
+            }
+        }
+
+        data2[p] = threshold * data[p];
+
+        return data2;
     }
 
     function squadredArr(arr) {
