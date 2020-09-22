@@ -9,9 +9,13 @@
     function loadHM() {
         $.getJSON('/emax', function (data) {
             console.log(data);
-            data = cutMax(0.01,data);
+            data = cutMax(0.01, data);
             var d = { z: squadredArr(data), type: 'heatmap' };
             Plotly.newPlot('heatmap', [d]);
+            var PlotHM = document.getElementById('heatmap');
+            PlotHM.on('plotly_click', function (data) {
+                console.log(data.points[0].pointIndex);
+            });
         });
     }
 
@@ -53,6 +57,10 @@
         }
         return m;
     }
+
+    $(function () {
+
+    })
 </script>
 
 <body>
