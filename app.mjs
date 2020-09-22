@@ -4,11 +4,13 @@ import fs from 'fs';
 import path from 'path';
 
 var bigfilepath = process.argv[2];
-var mear = new MEARecord(bigfilepath);
+var mappath = process.argv[3];
+var mear = new MEARecord(bigfilepath,mappath);
 
 async function main() {
     await mear.load();
-    console.log('Server available');
+    console.log(mear.epos[5]);
+    console.log('Server available http://localhost:8080/');
     http.createServer(function (req, res) {
         console.log(req.url);
         try {

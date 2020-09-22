@@ -1,18 +1,20 @@
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
 import readline from 'readline';
 import stream from 'stream';
 import { config } from './config.mjs';
 var outstream = new stream;
 
 class MEARecord {
-    constructor(bigfilepath) {
+    constructor(bigfilepath, mappath) {
         this.bigfile = {
             path: bigfilepath,
             length: 0
         };
+        this.mappath = mappath;
         this.max = 0;
         this.artelines = [];
         this.electrodes = [];
+        this.epos = this.getEpos();
         this.maxthreshold = config.threshold;
         this.t0 = new Date().getTime();
     }
@@ -105,6 +107,12 @@ class MEARecord {
         });
     }
 
+    getEpos(){
+        var l = readFileSync(this.mappath,'utf8');
+        var pos = l.split(',');
+        return pos;
+    }
+
     get eMax(){
         var aMax = [];
         this.electrodes.forEach(function(v,i){
@@ -112,7 +120,12 @@ class MEARecord {
                 aMax[i] = Math.max(aMax[i] || 0, v2);
             })
         });
-        return aMax;
+        var eMax = [];
+        for(var i = 0; i < aMax.length; i++){
+            //eMax[i] = aMax[this.epos[i]];
+            eMax[this.epos[i]] = aMax[i];
+        }
+        return eMax;
     }
 
     get timer(){

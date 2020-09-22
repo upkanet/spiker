@@ -18,7 +18,6 @@
         $.getJSON('/electrodes/252', function (data) {
             console.log(data);
             var d = { y: data.map(x => -x), type: 'line' };
-            drawPlot([d]);
             Plotly.newPlot('gElectrode', [d]);
         });
     }
@@ -41,7 +40,7 @@
 
 <body>
     <button type="button" onclick="loadHM()">LoadHM</button>
-    <div id="heatmap" style="width:100%;height:500px;"></div>
+    <div id="heatmap" style="width:500px;height:500px;"></div>
     <button type="button" onclick="loadE()">Load</button>
     <div id="gElectrode" style="width:100%;height:500px;"></div>
 </body>
