@@ -113,11 +113,14 @@ class MEARecord {
         var arr = l.split(',');
         var e = this.electrodes;
         arr.forEach(function(v,i){
-            if(e[i]){
-                e[i].push(Number(v));
-            }
-            else{
-                e[i] = [Number(v)];
+            if(i>0){
+                var j = i - 1;
+                if(e[j]){
+                    e[j].push(Number(v));
+                }
+                else{
+                    e[j] = [Number(v)];
+                }
             }
         });
         this.electrodes = e;

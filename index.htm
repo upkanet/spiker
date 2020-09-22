@@ -11,7 +11,7 @@
     }
 
     function loadE() {
-        $.getJSON('/electrodes/250', function (data) {
+        $.getJSON('/electrodes/252', function (data) {
             console.log(data);
             var d = { y: data.map(x => -x), type: 'line' };
             drawPlot([d]);
