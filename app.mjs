@@ -15,7 +15,8 @@ async function main(){
             res.write(d);
         }
         else if(req.url == '/favicon.ico'){
-            res.write('');
+            var d = fs.readFileSync('favicon.ico');
+            res.write(d);
         }
         else if(req.url.match(/^\/electrodes\/(?:([^\/]+?))\/?$/i)){
             var eid = req.url.match(/^\/electrodes\/(?:([^\/]+?))\/?$/i)[1];
