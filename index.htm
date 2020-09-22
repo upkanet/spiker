@@ -1,16 +1,27 @@
 <html>
-    <head>
-        <title>Axorus - Spiker</title>
-    </head>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script>
-        function loadE(){
-            $.getJSON('/electrodes/0',function(d){
-                console.log(d);
-            });
-        }
-    </script>
-    <body>
-        <button type="button" onclick="loadE()">Load</button>
-    </body>
+
+<head>
+    <title>Axorus - Spiker</title>
+</head>
+<script src="js/jquery3.5.1.min.js"></script>
+<script src="js/plotly-latest.min.js"></script>
+<script>
+    function drawPlot(data) {
+        Plotly.newPlot('gElectrode', data);
+    }
+
+    function loadE() {
+        $.getJSON('/electrodes/250', function (data) {
+            console.log(data);
+            var d = { y: data.map(x => -x), type: 'line' };
+            drawPlot([d]);
+        });
+    }
+</script>
+
+<body>
+    <button type="button" onclick="loadE()">Load</button>
+    <div id="gElectrode" style="width:100%;height:500px;"></div>
+</body>
+
 </html>
