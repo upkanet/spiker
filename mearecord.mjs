@@ -105,6 +105,16 @@ class MEARecord {
         });
     }
 
+    get eMax(){
+        var aMax = [];
+        this.electrodes.forEach(function(v,i){
+            v.forEach(function(v2,i2){
+                aMax[i] = Math.max(aMax[i] || 0, v2);
+            })
+        });
+        return aMax;
+    }
+
     get timer(){
         return (new Date().getTime() - this.t0) / 1000 + ' sec.';
     }

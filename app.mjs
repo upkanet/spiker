@@ -20,6 +20,9 @@ async function main() {
                 var d = fs.readFileSync(req.url.substr(1));
                 res.write(d);
             }
+            else if (req.url == '/emax') {
+                res.write(JSON.stringify(mear.eMax));
+            }
             else if (req.url.match(/^\/electrodes\/(?:([^\/]+?))\/?$/i)) {
                 var eid = req.url.match(/^\/electrodes\/(?:([^\/]+?))\/?$/i)[1];
                 res.write(JSON.stringify(mear.electrodes[eid]));
