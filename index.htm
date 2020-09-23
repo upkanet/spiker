@@ -3,27 +3,45 @@
 <head>
     <title>Axorus - Spiker</title>
 </head>
+<style>
+    body {
+        background-color: black;
+    }
+</style>
 <script src="js/jquery3.5.1.min.js"></script>
 <script src="js/plotly-latest.min.js"></script>
 <script>
+    var layoutBlack = { paper_bgcolor: 'black', plot_bgcolor: 'black', font: {color: 'white'} };
+
     function loadHM() {
         $.getJSON('/emax', function (data) {
             console.log(data);
             data = cutMax(0.01, data);
             var d = { z: squadredArr(data), type: 'heatmap' };
-            Plotly.newPlot('heatmap', [d]);
+            Plotly.newPlot('heatmap', [d], layoutBlack);
             var PlotHM = document.getElementById('heatmap');
-            PlotHM.on('plotly_click', function (data) {
-                console.log(data.points[0].pointIndex);
-            });
+            PlotHM.on('plotly_click', clickHM);
         });
     }
 
-    function loadE() {
-        $.getJSON('/electrodes/252', function (data) {
+    function clickHM(data) {
+        var pc = data.points[0].pointIndex;
+        console.log(pc[0], pc[1]);
+        $.getJSON('/epos/' + pc[0] + ',' + pc[1], function (data) {
+            console.log('Electrode #' + data);
+            loadE(data);
+        });
+    }
+
+    function loadE(n) {
+        if (n === undefined) {
+            n = $('#eid').val();
+        }
+        $.getJSON('/electrodes/' + n, function (data) {
+            $('#eid').val(n);
             console.log(data);
             var d = { y: data.map(x => -x), type: 'line' };
-            Plotly.newPlot('gElectrode', [d]);
+            Plotly.newPlot('gElectrode', [d], layoutBlack);
         });
     }
 
@@ -66,7 +84,7 @@
 <body>
     <button type="button" onclick="loadHM()">LoadHM</button>
     <div id="heatmap" style="width:500px;height:500px;"></div>
-    <button type="button" onclick="loadE()">Load</button>
+    <input id="eid" type="number"><button type="button" onclick="loadE()">Load</button>
     <div id="gElectrode" style="width:100%;height:500px;"></div>
 </body>
 

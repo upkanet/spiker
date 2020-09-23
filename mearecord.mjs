@@ -113,6 +113,12 @@ class MEARecord {
         return pos;
     }
 
+    electrodeAt(x,y){
+        var x2 = 15 - x;
+        var lpos = y*15 + x2;
+        return this.epos[lpos];
+    }
+
     get eMax(){
         var aMax = [];
         this.electrodes.forEach(function(v,i){

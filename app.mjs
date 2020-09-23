@@ -9,7 +9,6 @@ var mear = new MEARecord(bigfilepath,mappath);
 
 async function main() {
     await mear.load();
-    console.log(mear.epos[5]);
     console.log('Server available http://localhost:8080/');
     http.createServer(function (req, res) {
         console.log(req.url);
@@ -28,6 +27,12 @@ async function main() {
             else if (req.url.match(/^\/electrodes\/(?:([^\/]+?))\/?$/i)) {
                 var eid = req.url.match(/^\/electrodes\/(?:([^\/]+?))\/?$/i)[1];
                 res.write(JSON.stringify(mear.electrodes[eid]));
+            }
+            else if (req.url.match(/^\/epos\/(?:([^\/]+?)),(?:([^\/]+?))\/?$/i)){
+                var r = req.url.match(/^\/epos\/(?:([^\/]+?)),(?:([^\/]+?))\/?$/i);
+                var x = r[1];
+                var y = r[2];
+                res.write(JSON.stringify(''+mear.electrodeAt(x,y)));
             }
             else {
                 var d = fs.readFileSync(req.url.substr(1), 'utf-8');
