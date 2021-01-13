@@ -51,7 +51,7 @@
         var availableFilters = iirCalculator.available();
 
         var iirFilterCoeffsLP = iirCalculator.lowpass({
-            order: 6, // cascade 3 biquad filters (max: 12)
+            order: 10, // cascade 3 biquad filters (max: 12)
             characteristic: 'butterworth',
             Fs: 20000, // sampling frequency
             Fc: 3000, // cutoff frequency / center frequency for bandpass, bandstop, peak
@@ -60,7 +60,7 @@
         var iirFilterLP = new Fili.IirFilter(iirFilterCoeffsLP);
 
         var iirFilterCoeffsHP = iirCalculator.highpass({
-            order: 6, // cascade 3 biquad filters (max: 12)
+            order: 10, // cascade 3 biquad filters (max: 12)
             characteristic: 'butterworth',
             Fs: 20000, // sampling frequency
             Fc: 300, // cutoff frequency / center frequency for bandpass, bandstop, peak
