@@ -28,14 +28,15 @@
     function loadSpectrum() {
         $.getJSON('/spectrum', function (data) {
             var N = data.length;
-            var d = {x: data.map((x,k) => k / (N * period)), y: data.map(x => x), type: 'line' };
+            //var d = {y: data.map(x => x), type: 'line' };
+            var d = {x: data.map((x,k) => k / (2 * N * period)), y: data.map(x => x), type: 'line' };
             Plotly.newPlot('gSpectrum', [d], layoutBlack);
         });
     }
 
     function getPeriod(){
         $.getJSON('/period', function (data) {
-            period = data * 10000;
+            period = data;
             load();
             loadSpectrum();
         });

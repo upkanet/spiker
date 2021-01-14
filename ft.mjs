@@ -7,7 +7,7 @@ var electrodeNumber = Number(process.argv[3] || 1);
 var mear = new MEARecordFT(bigfilepath,electrodeNumber);
 
 async function main() {
-    await mear.load();
+    await mear.load(-10);
     console.log('Server available http://localhost:8080/');
     http.createServer(function (req, res) {
         console.log(req.url);
@@ -21,7 +21,7 @@ async function main() {
                 res.write(d);
             }
             else if (req.url == '/data') {
-                res.write(JSON.stringify(mear.electrodeSimplifiedData));
+                res.write(JSON.stringify(mear.electrodeWorkingData));
             }
             else if (req.url == '/spectrum') {
                 res.write(JSON.stringify(mear.electrodeSpectrum));
