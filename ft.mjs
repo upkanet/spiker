@@ -7,7 +7,7 @@ var electrodeNumber = Number(process.argv[3] || 1);
 var mear = new MEARecordFT(bigfilepath,electrodeNumber);
 
 async function main() {
-    await mear.load(-10);
+    await mear.load();
     console.log('Server available http://localhost:8080/');
     http.createServer(function (req, res) {
         console.log(req.url);
