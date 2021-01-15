@@ -16,7 +16,8 @@ node app.mjs mearecord.csv meamapping.csv
 Fourier Transform server
 
 ```bash
-node ft.mjs data-test/sin.txt
+node ft.mjs file
+node ft.mjs #test with Sinus file
 
 ```
 
