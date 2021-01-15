@@ -4,7 +4,8 @@
   "description": "Multi Electrodes Array (MEA) records analyzer",
   "main": "index.js",
   "dependencies": {
-    "mathjs": "^8.1.1"
+    "mathjs": "^8.1.1",
+    "open": "^7.3.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

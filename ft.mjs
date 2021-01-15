@@ -1,6 +1,7 @@
 import { MEARecordFT } from './mearecordft.mjs';
 import http from 'http';
 import fs from 'fs';
+import open from 'open';
 
 var config = JSON.parse(fs.readFileSync('config.json','utf-8'));
 
@@ -10,6 +11,7 @@ var mear = new MEARecordFT(bigfilepath,config.electrode_number);
 async function main() {
     await mear.load();
     console.log('Server available','http://localhost:8080/');
+    open('http://localhost:8080/');
     http.createServer(function (req, res) {
         if(config.verbose_server){
             console.log('\x1b[36m%s\x1b[0m',req.url);
