@@ -1,0 +1,22 @@
+{
+  "name": "spiker",
+  "version": "1.0.0",
+  "description": "Multi Electrodes Array (MEA) records analyzer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/upkanet/spiker.git"
+  },
+  "author": "JD",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/upkanet/spiker/issues"
+  },
+  "homepage": "https://github.com/upkanet/spiker#readme",
+  "dependencies": {
+    "math.js": "^1.1.46"
+  }
+}
