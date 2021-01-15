@@ -13,7 +13,7 @@
 <script src="js/fili.min.js"></script>
 <script src="js/math.min.js"></script>
 <script>
-    var layoutBlack = { paper_bgcolor: 'black', plot_bgcolor: 'black', font: { color: 'white' } };
+    var layoutBlack = { paper_bgcolor: 'black', plot_bgcolor: 'black', font: { color: 'white' }, xaxis: {'title': ''}, xaxis: {ticksuffix:''} };
     var period = 0;
     var fk0 = 0;
     getPeriod();
@@ -21,6 +21,8 @@
     function load() {
         $.getJSON('/data', function (data) {
             var d = {x: data.map((x,index) => index * period), y: data.map(x => x), type: 'line' };
+            layoutBlack.xaxis.title = 'time';
+            layoutBlack.xaxis.ticksuffix = 's';
             Plotly.newPlot('gElectrode', [d], layoutBlack);
         });
     }
@@ -30,6 +32,8 @@
             var N = data.length;
             //var d = {y: data.map(x => x), type: 'line' };
             var d = {x: data.map((x,k) => k / (2 * N * period)), y: data.map(x => x), type: 'line' };
+            layoutBlack.xaxis.title = 'frequency';
+            layoutBlack.xaxis.ticksuffix = 'Hz';
             Plotly.newPlot('gSpectrum', [d], layoutBlack);
         });
     }
@@ -45,10 +49,8 @@
 </script>
 
 <body>
-    <button type="button" onclick="load()">Load</button>
-    <div id="gElectrode" style="width:100%;height:400px;"></div>
-    <button type="button" onclick="loadSpectrum()">Spectrum</button>
-    <div id="gSpectrum" style="width:100%;height:400px;"></div>
+    <div id="gElectrode" style="width:100%;height:450px;"></div>
+    <div id="gSpectrum" style="width:100%;height:450px;"></div>
 </body>
 
 </html>
