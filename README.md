@@ -8,14 +8,12 @@ npm i
 
 ```
 
-Launch the server (Node with Modules >= v12.18.4)
-
+Launch the server (Node with Modules >= v14.15.4)
 ```bash
 node app.mjs mearecord.csv meamapping.csv
 
 ```
-
-Fourier transform server
+Fourier Transform server
 
 ```bash
 node ft.mjs data-test/sin.txt
