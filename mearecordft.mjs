@@ -25,7 +25,7 @@ class MEARecordFT {
     }
 
     async load() {
-        console.log("MEARecord Fourrier Transform");
+        console.log("Axorus MEARecord Fourrier Transform");
         console.log("File :",this.bigfile.path);
         //Extract electrode data, vector size and period
         [this.linecount, this.period, this.electrodeData] = await this.electrodeDataGen();
@@ -39,6 +39,9 @@ class MEARecordFT {
         this.timer();
         //Analyze spectrum
         this.spectrum();
+        this.timer();
+        //Get top frequencies
+        this.topfrequencies();
         this.timer();
     }
 
@@ -156,12 +159,32 @@ class MEARecordFT {
         process.stdout.write("\n");
     }
 
+    topfrequencies(){
+        var eS = this.electrodeSpectrum.slice();
+        var top_size = config.top_frequencies;
+        var top_values = [];
+        for(var i = 0; i < top_size;i++){
+            var m = getMaxArray(eS);
+            var p = eS.indexOf(m);
+            eS.splice(p,1);
+            top_values.push(this.electrodeSpectrum.indexOf(m));
+        }
+        var N = this.electrodeSpectrum.length;
+        var period = this.timeperiod;
+        console.log("Top Frequencies",top_values.map(k => Math.round(k  / (2 * N * period) * 100) / 100 + "Hz"));
+        return top_values;
+    }
+
 }
 
 function updateConsole(txt){
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
     process.stdout.write('\x1b[36m'+txt+'\x1b[0m');
+}
+
+function getMaxArray(a) {
+    return Math.max.apply(null, a);
 }
 
 export { MEARecordFT };
