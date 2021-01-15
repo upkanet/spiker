@@ -2,8 +2,8 @@ import fs from 'fs';
 import readline from 'readline';
 import stream from 'stream';
 import { complex, pi, sin, cos, add, multiply, rightArithShift } from 'mathjs';
-import { config } from './config.mjs';
 var outstream = new stream;
+var config = JSON.parse(fs.readFileSync('config.json','utf-8'));
 
 class MEARecordFT {
     constructor(bigfilepath, electrodeNumber) {
@@ -22,27 +22,21 @@ class MEARecordFT {
         this.speriod = 0;
         this.unitsTab = {'s': 0, 'ms': -3, 'µs': -6};
         this.units = 's';
-        this.simp = true;
     }
 
-    async load(threshold = null) {
+    async load() {
         console.log("MEARecord Fourrier Transform");
         console.log(this.bigfile.path);
         console.log("Electrode #"+this.electrodeNumber);
         [this.linecount, this.period, this.electrodeData] = await this.electrodeDataGen();
         console.log(this.timer);
         console.log(this.linecount+" points","Sampling "+Math.round(1/this.timeperiod)+"Hz");
-        if(threshold){
+        /*if(threshold){
             this.cut(threshold);
-        }
-        if(this.simp){
-            console.log("Simplification");
-            this.simplify();
-            this.electrodeWorkingData = this.electrodeSimplifiedData;
-        }
-        else{
-            this.electrodeWorkingData = this.electrodeData;
-        }
+        }*/
+        console.log("Simplification");
+        this.simplify();
+        this.electrodeWorkingData = this.electrodeSimplifiedData;
         console.log(this.timer);
         console.log("DFT");
         this.spectrum();
@@ -80,18 +74,24 @@ class MEARecordFT {
     }
 
     simplify(){
-        var pace = 4;
+        var pace = config.simplification_rate;
         this.speriod = this.period * pace;
-        var i = 0;
-        var s = 0;
-        while(this.electrodeData.length){
-            s += this.electrodeData.shift();
-            i++
-            if(i==pace){
-                this.electrodeSimplifiedData.push(Math.round(s/pace*100)/100);
-                s = 0;
-                i = 0;
+        console.log("one every",pace,"values");
+        if(pace>1){
+            var i = 0;
+            var s = 0;
+            while(this.electrodeData.length){
+                s += this.electrodeData.shift();
+                i++
+                if(i==pace){
+                    this.electrodeSimplifiedData.push(Math.round(s/pace*100)/100);
+                    s = 0;
+                    i = 0;
+                }
             }
+        }
+        else{
+            this.electrodeSimplifiedData = this.electrodeData;
         }
     }
 
@@ -110,12 +110,7 @@ class MEARecordFT {
     }
 
     get timeperiod(){
-        if(this.simp){
-            return this.speriod * Math.pow(10,this.unitsTab[this.units]);
-        }
-        else{
-            return this.period * Math.pow(10,this.unitsTab[this.units]);
-        }
+        return this.speriod * Math.pow(10,this.unitsTab[this.units]);
     }
 
     Xk(k){

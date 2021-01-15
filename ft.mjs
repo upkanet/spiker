@@ -2,9 +2,10 @@ import { MEARecordFT } from './mearecordft.mjs';
 import http from 'http';
 import fs from 'fs';
 
-var bigfilepath = process.argv[2];
-var electrodeNumber = Number(process.argv[3] || 1);
-var mear = new MEARecordFT(bigfilepath,electrodeNumber);
+var config = JSON.parse(fs.readFileSync('config.json','utf-8'));
+
+var bigfilepath = (process.argv[2] || "data-test/sin.txt");
+var mear = new MEARecordFT(bigfilepath,config.electrode_number);
 
 async function main() {
     await mear.load();
