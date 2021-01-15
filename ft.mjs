@@ -9,9 +9,11 @@ var mear = new MEARecordFT(bigfilepath,config.electrode_number);
 
 async function main() {
     await mear.load();
-    console.log('Server available http://localhost:8080/');
+    console.log('Server available','http://localhost:8080/');
     http.createServer(function (req, res) {
-        console.log('\x1b[36m%s\x1b[0m',req.url);
+        if(config.verbose_server){
+            console.log('\x1b[36m%s\x1b[0m',req.url);
+        }
         try {
             if (req.url == '/') {
                 var d = fs.readFileSync('ft.htm', 'utf-8');
