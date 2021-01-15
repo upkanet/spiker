@@ -1,7 +1,7 @@
 import fs from 'fs';
 import readline from 'readline';
 import stream from 'stream';
-import { complex, pi, sin, cos, add, multiply, rightArithShift } from 'mathjs'
+import { complex, pi, sin, cos, add, multiply, rightArithShift } from 'mathjs';
 import { config } from './config.mjs';
 var outstream = new stream;
 
