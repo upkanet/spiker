@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Multi Electrodes Array (MEA) records analyzer",
   "main": "index.js",
+  "dependencies": {
+    "mathjs": "^8.1.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,8 +18,5 @@
   "bugs": {
     "url": "https://github.com/upkanet/spiker/issues"
   },
-  "homepage": "https://github.com/upkanet/spiker#readme",
-  "dependencies": {
-    "math.js": "^1.1.46"
-  }
+  "homepage": "https://github.com/upkanet/spiker#readme"
 }
