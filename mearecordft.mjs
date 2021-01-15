@@ -21,7 +21,7 @@ class MEARecordFT {
         this.period = 0;
         this.speriod = 0;
         this.unitsTab = {'s': 0, 'ms': -3, 'µs': -6};
-        this.units = 's';
+        this.units = config.units;
     }
 
     async load() {
@@ -161,7 +161,7 @@ class MEARecordFT {
 function updateConsole(txt){
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
-    process.stdout.write(txt);
+    process.stdout.write('\x1b[36m'+txt+'\x1b[0m');
 }
 
 export { MEARecordFT };
