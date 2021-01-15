@@ -1,0 +1,11 @@
+{
+    "simplification_rate":4,
+    "electrode_number":1,
+    "units": "s",
+    "threshold":{
+        "active": false,
+        "value": 0,
+        "direction": "<"
+    },
+    "timer":false
+}
