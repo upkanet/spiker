@@ -26,21 +26,20 @@ class MEARecordFT {
 
     async load() {
         console.log("MEARecord Fourrier Transform");
-        console.log(this.bigfile.path);
+        console.log("File :",this.bigfile.path);
         //Extract electrode data, vector size and period
         [this.linecount, this.period, this.electrodeData] = await this.electrodeDataGen();
-        console.log(this.timer);
-        console.log(this.linecount+" points","Sampling "+Math.round(1/this.timeperiod)+"Hz");
+        this.timer();
+        console.log("Vector",this.linecount,"points","| Sampling",Math.round(1/this.period),"Hz");
         //Cut threshold
         this.cut(config.threshold.value);
         //Simplify data
         this.simplify();
         this.electrodeWorkingData = this.electrodeSimplifiedData;
-        console.log(this.timer);
+        this.timer();
         //Analyze spectrum
-        console.log("DFT");
         this.spectrum();
-        console.log(this.timer);
+        this.timer();
     }
 
     async electrodeDataGen(){
@@ -75,10 +74,9 @@ class MEARecordFT {
     }
 
     simplify(){
-        console.log("Simplification");
         var pace = config.simplification_rate;
         this.speriod = this.period * pace;
-        console.log("one every",pace,"values");
+        console.log("Simplification : one every",pace,"values");
         if(pace>1){
             var i = 0;
             var s = 0;
@@ -116,8 +114,14 @@ class MEARecordFT {
         }
     }
 
-    get timer(){
-        return (new Date().getTime() - this.t0) / 1000 + ' sec.';
+    timer(verbose = true){
+        var t = (new Date().getTime() - this.t0) / 1000;
+        if(verbose && config.timer){
+            console.log(t, ' sec.');
+        }
+        else{
+            return t + ' sec.';
+        }
     }
 
     get timeperiod(){
@@ -141,16 +145,23 @@ class MEARecordFT {
 
     spectrum(){
         var N = this.electrodeWorkingData.length;
-        console.log(N, "values");
+        console.log("Spectrum Analysis on",Math.round(N/2), "values");
         for(var k=0;k<N/2;k++){
             if(k%100 == 0){
-                console.log(k, this.timer);
+                updateConsole(k+" / "+Math.round(N/2)+" - "+this.timer(false));
             }
             var magk = this.Xk(k).abs();
             this.electrodeSpectrum.push(magk);
         }
+        process.stdout.write("\n");
     }
 
+}
+
+function updateConsole(txt){
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write(txt);
 }
 
 export { MEARecordFT };
