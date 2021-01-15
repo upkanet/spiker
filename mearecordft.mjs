@@ -27,23 +27,24 @@ class MEARecordFT {
     async load() {
         console.log("MEARecord Fourrier Transform");
         console.log(this.bigfile.path);
-        console.log("Electrode #"+this.electrodeNumber);
+        //Extract electrode data, vector size and period
         [this.linecount, this.period, this.electrodeData] = await this.electrodeDataGen();
         console.log(this.timer);
         console.log(this.linecount+" points","Sampling "+Math.round(1/this.timeperiod)+"Hz");
-        /*if(threshold){
-            this.cut(threshold);
-        }*/
-        console.log("Simplification");
+        //Cut threshold
+        this.cut(config.threshold.value);
+        //Simplify data
         this.simplify();
         this.electrodeWorkingData = this.electrodeSimplifiedData;
         console.log(this.timer);
+        //Analyze spectrum
         console.log("DFT");
         this.spectrum();
         console.log(this.timer);
     }
 
     async electrodeDataGen(){
+        console.log("Electrode",this.electrodeNumber);
         var instream = fs.createReadStream(this.bigfile.path);
         var rl = readline.createInterface(instream, outstream);
         var linecount = 0;
@@ -74,6 +75,7 @@ class MEARecordFT {
     }
 
     simplify(){
+        console.log("Simplification");
         var pace = config.simplification_rate;
         this.speriod = this.period * pace;
         console.log("one every",pace,"values");
@@ -95,12 +97,21 @@ class MEARecordFT {
         }
     }
 
-    cut(threshold){
-        console.log("Cut at "+threshold);
-        for(var i = 0; i < this.electrodeData.length; i++){
-            var v = this.electrodeData[i];
-            if(v>threshold){
-                this.electrodeData[i] = 0;
+    cut(){
+        if(config.threshold.active){
+            var threshold = config.threshold.value;
+            console.log("Cut at",threshold);
+    
+            var comparator = {
+                '>': function(x,y) {return x > y},
+                '<': function(x,y) {return x < y}
+            }
+    
+            for(var i = 0; i < this.electrodeData.length; i++){
+                var v = this.electrodeData[i];
+                if(comparator[config.threshold.direction](v,threshold)){
+                    this.electrodeData[i] = 0;
+                }
             }
         }
     }
