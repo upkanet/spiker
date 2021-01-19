@@ -159,7 +159,7 @@ class MEARecordFT {
         process.stdout.write("\n");
     }
 
-    topfrequencies(){
+    topfrequencies(verbose = true){
         var eS = this.electrodeSpectrum.slice();
         var top_size = config.top_frequencies;
         var top_values = [];
@@ -171,7 +171,7 @@ class MEARecordFT {
         }
         var N = this.electrodeSpectrum.length;
         var period = this.timeperiod;
-        top_values.sort();
+        top_values.sort(function(a, b) {return b - a;});
         console.log("Top Frequencies",top_values.map(k => Math.round(k  / (2 * N * period) * 100) / 100 + "Hz"));
         return top_values;
     }
