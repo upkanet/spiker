@@ -4,6 +4,7 @@
   "description": "Multi Electrodes Array (MEA) records analyzer",
   "main": "index.js",
   "dependencies": {
+    "binary-buffer-parser": "^2.1.1",
     "mathjs": "^8.1.1",
     "open": "^7.3.1"
   },
