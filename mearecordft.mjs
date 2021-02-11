@@ -159,7 +159,7 @@ class MEARecordFT {
         process.stdout.write("\n");
     }
 
-    topfrequencies(){
+    topfrequencies(verbose = true){
         var eS = this.electrodeSpectrum.slice();
         var top_size = config.top_frequencies;
         var top_values = [];
