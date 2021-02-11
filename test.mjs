@@ -1,7 +1,13 @@
 import {Record} from './record.mjs';
 
-var r = new Record('data/10007.raw');
+var r = new Record('data/20007.raw');
 
-var x = r.electrode(2);
-console.log(x);
+var x;
+
+x = r.electrode(1);
+console.log(x.length);
+x = r.electrode(1,1);
+console.log(x.length);
+x = r.electrode(1,2);
+console.log(x.length);
 
