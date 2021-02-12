@@ -1,13 +1,5 @@
 {
-    "simplification_rate":4,
-    "electrode_number":1,
-    "units": "s",
-    "threshold":{
-        "active": false,
-        "value": 0,
-        "direction": "<"
-    },
-    "top_frequencies":3,
-    "timer":false,
-    "verbose_server":false
+    "simplification_rate":12,
+    "last_seconds":2,
+    "top_frequencies":4
 }

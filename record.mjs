@@ -54,7 +54,7 @@ class Electrode {
             this.s_sample_rate = this.sample_rate / pace;
             if (pace > 1) {
                 var s = 0;
-                this.data.forEach((e, i) => {
+                this.tData.forEach((e, i) => {
                     s += e;
                     if (i % pace == 0) {
                         this.simplified_data.push(Math.round(s / pace * 100) / 100);
@@ -63,7 +63,7 @@ class Electrode {
                 });
             }
             else {
-                this.simplified_data = this.data;
+                this.simplified_data = this.tData;
             }
 
             this.simplified = true;
@@ -107,11 +107,35 @@ class Electrode {
             var N = this.sData.length;
             console.log("Spectrum Analysis on", Math.round(N / 2), "values");
             for (var k = 0; k < N / 2; k++) {
+                if(k%100 == 0) updateConsole(k+" / "+Math.round(N/2));
                 var magk = this.Xk(k).abs();
                 this.spectrum_data.push(magk);
             }
+            process.stdout.write("\n");
             this.spectrumed = true;
         }
+    }
+
+    get topFreq() {
+        var a = [];
+        var topFrequencies = config.top_frequencies;
+
+        while(a.length < topFrequencies){
+            var max = 0;
+            var kmax = 0;
+            this.spectrum.forEach((v,k) => {
+                if(v>max && !a.includes(k)){
+                    max = v;
+                    kmax = k;
+                }
+            });
+            a.push(kmax);
+        }
+
+        var N = this.sData.length;
+        a = a.map(k => Math.round(k  / (2 * N / this.sample_rate) * 100) / 100)
+
+        return a;
     }
 }
 
@@ -129,23 +153,20 @@ class Record {
     }
 
     header() {
-        const start = Date.now();
         const fileParser = new BinaryParser();
         fileParser.open(this.path);
 
         //Header
-        console.log("Header");
+        console.log("Analyzing header");
         var header = fileParser.string0();
         header = header.split('\n');
         this.sample_rate = Number(header[3].substr(14));
         this.ADC_zero = Number(header[4].substr(11));
         this.El = Number(header[5].substr(5, 6));
         this.channels = header[6].split(';').length;
-        console.log(Date.now() - start, "ms");
     }
 
     electrode(electrode = 1) {
-        const start = Date.now();
         const fileParser = new BinaryParser();
         fileParser.open(this.path);
 
@@ -167,7 +188,7 @@ class Record {
                 }
             }
             fileParser.close();
-            console.log(Date.now() - start, "ms");
+
             this.electrodes[electrode] = el;
         }
         return this.electrodes[electrode];
@@ -219,19 +240,27 @@ class Experiment {
             var r = this.records[k];
             console.log(r.filename);
             this.electrodes.forEach((e) => {
-                r.electrode(e);
+                r.electrode(e).spectrum;
             });
         }
     }
 
     show(){
+        console.log("Results");
+        console.log("Filename\tElec\tVmin\tVmax\tFrequencies");
         for(var k in this.records){
             var r = this.records[k];
             r.electrodes.forEach((e) => {
-                console.log(`${r.filename}\telectrode ${e.number}\t${e.min}\t${e.max}`);
+                console.log(`${r.filename}\tE${e.number}\t${e.min}\t${e.max}\t${e.topFreq.join(',')}`);
             });
         }
     }
+}
+
+function updateConsole(txt){
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write('\x1b[36m'+txt+'\x1b[0m');
 }
 
 export { Record, Experiment };
