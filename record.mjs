@@ -1,21 +1,138 @@
+import fs from 'fs';
+import path from 'path';
 import BinaryParser from 'binary-buffer-parser';
+import { complex, pi, sin, cos, add, multiply } from 'mathjs';
+var config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
+
+class Electrode {
+    constructor(number, sample_rate) {
+        this.number = number;
+        this.sample_rate = sample_rate;
+        this.tuncated = -1;
+        this.simplified = false;
+        this.spectrumed = false;
+        this.data = [];
+        this.truncated_data = [];
+        this.simplified_data = [];
+        this.spectrum_data = [];
+    }
+
+    get tData(){
+        this.truncate();
+        return this.truncated_data;
+    }
+
+    get sData(){
+        this.simplify();
+        return this.simplified_data;
+    }
+
+    get spectrum(){
+        this.FT();
+        return this.spectrum_data;
+    }
+
+    truncate() {
+        var lastSeconds = config.last_seconds;
+        if(this.truncated != lastSeconds){
+            console.log("Keeping last ", lastSeconds, "sec. of Electrode", this.number);
+            var lastSamples = lastSeconds * this.sample_rate;
+            var firstKeep = this.data.length - lastSamples;
+            this.data.forEach((e, i) => {
+                if (i >= firstKeep) {
+                    this.truncated_data.push(e);
+                }
+            });
+            this.tuncated = lastSeconds;
+        }
+        return this.truncated_data;
+    }
+
+    simplify(){
+        if(!this.simplified){
+            var pace = config.simplification_rate;
+            this.s_sample_rate = this.sample_rate / pace;
+            if (pace > 1) {
+                var s = 0;
+                this.data.forEach((e, i) => {
+                    s += e;
+                    if (i % pace == 0) {
+                        this.simplified_data.push(Math.round(s / pace * 100) / 100);
+                        s = 0;
+                    }
+                });
+            }
+            else {
+                this.simplified_data = this.data;
+            }
+
+            this.simplified = true;
+        }
+    }
+
+    push(v) {
+        this.data.push(v);
+    }
+
+    get max() {
+        var max = 0;
+        this.data.forEach((v) => {
+            if (v > max) max = v;
+        });
+        return max;
+    }
+
+    get min() {
+        var min = 0;
+        this.data.forEach((v) => {
+            if (v < min) min = v;
+        });
+        return min;
+    }
+
+    Xk(k) {
+        var N = this.sData.length;
+        var s = complex(0, 0);
+        for (var n = 0; n < N; n++) {
+            var bn = -2 * pi * k * n / N;
+            var xn = this.sData[n];
+            var sn = multiply(xn, complex(cos(bn), sin(bn)));
+            s = add(s, sn);
+        }
+        return s;
+    }
+
+    FT() {
+        if (!this.spectrumed) {
+            var N = this.sData.length;
+            console.log("Spectrum Analysis on", Math.round(N / 2), "values");
+            for (var k = 0; k < N / 2; k++) {
+                var magk = this.Xk(k).abs();
+                this.spectrum_data.push(magk);
+            }
+            this.spectrumed = true;
+        }
+    }
+}
+
 
 class Record {
-    constructor(path) {
-        this.path = path;
+    constructor(fpath) {
+        this.path = fpath;
         this.sample_rate;
         this.ADC_zero;
         this.El;
         this.channels = 0;
-        this.data = [];
+        this.electrodes = [];
+        this._spectrum = [];
         this.header();
     }
 
-    header(){
+    header() {
         const start = Date.now();
         const fileParser = new BinaryParser();
         fileParser.open(this.path);
-    
+
         //Header
         console.log("Header");
         var header = fileParser.string0();
@@ -27,90 +144,94 @@ class Record {
         console.log(Date.now() - start, "ms");
     }
 
-    electrode(electrode = 1, lastSeconds = -1){
+    electrode(electrode = 1) {
         const start = Date.now();
         const fileParser = new BinaryParser();
         fileParser.open(this.path);
 
-        //Data
-        console.log("Electrode",electrode);
-        fileParser.seek(1875);
-        var a = [];
-        while(!fileParser.eof()){
-            for (var i = 0; i < this.channels; i++) {
-                if(i == electrode - 1){
-                    var v = fileParser.int16();
-                    v = Math.round(v * this.El * 100) / 100;
-                    a.push(v);
-                }
-                else{
-                    fileParser.skip(2);
+        if (this.electrodes[electrode] === undefined) {
+            //Data
+            console.log("Electrode", electrode);
+            fileParser.seek(1875);
+            var el = new Electrode(electrode, this.sample_rate);
+            while (!fileParser.eof()) {
+                for (var i = 0; i < this.channels; i++) {
+                    if (i == electrode - 1) {
+                        var v = fileParser.int16();
+                        v = Math.round(v * this.El * 100) / 100;
+                        el.push(v);
+                    }
+                    else {
+                        fileParser.skip(2);
+                    }
                 }
             }
+            fileParser.close();
+            console.log(Date.now() - start, "ms");
+            this.electrodes[electrode] = el;
         }
-        fileParser.close();
-        console.log(Date.now() - start, "ms");
-
-        //Keep lastSeconds
-        if(lastSeconds > 0){
-            var lastSamples = lastSeconds * this.sample_rate;
-            var firstKeep = a.length - lastSamples;
-            var b = [];
-            a.forEach((e,i) => {
-                if(i>=firstKeep){
-                    b.push(e);
-                }
-            });
-            a = b;
-        }
-
-        return a;
+        return this.electrodes[electrode];
     }
 
-    electrodes(eArr = [1]){
-        eArr.forEach((e) => {
-            this.data[e] = electrode(e);
+    get mins(){
+        var mins = [];
+        this.electrodes.forEach((el) => {
+            mins[el.number] = el.min;
         });
+        return mins;
     }
 
-    load(){
-        const start = Date.now();
-        const fileParser = new BinaryParser();
-        fileParser.open(this.path);
-
-        //Data
-        fileParser.seek(1875);
-        var k = 0;
-        while(!fileParser.eof()){
-            var a = [];
-            for (var i = 0; i < this.channels; i++) {
-                var v = fileParser.int16();
-                v = Math.round(v * this.El * 100) / 100;
-                a.push(v);
-            }
-            if(k == 20000) console.log(k/this.sample_rate, "sec in ", Date.now() - start, "ms");
-            this.data.push(a);
-            k++;
-        }
-        fileParser.close();
-    }
-
-    maxElectrode(electrode = 1){
-        var max = 0;
-        this.electrode(electrode).forEach((v) => {
-            if(v > max) max = v;
+    get maxs(){
+        var maxs = [];
+        this.electrodes.forEach((el) => {
+            maxs[el.number] = el.max;
         });
-        return max;
+        return maxs;
     }
 
-    minElectrode(electrode = 1){
-        var min = 0;
-        this.electrode(electrode).forEach((v) => {
-            if(v < min) min = v;
-        });
-        return min;
+    get filename(){
+        return path.basename(this.path);
     }
-
 }
 
-export { Record };
+class Experiment {
+    constructor(folderpath, electrodes) {
+        this.folderpath = folderpath;
+        this.electrodes = electrodes;
+        this.records = [];
+        this.loadRecords();
+    }
+
+    loadRecords(){
+        console.log("Folder",this.folderpath);
+        fs.readdirSync(this.folderpath).forEach((f) => {
+            if(path.extname(f) == '.raw'){
+                var fpath = path.join(this.folderpath,f);
+                var r = new Record(fpath);
+                this.records[r.filename] = r;
+            }
+        });
+        this.loadElectrodes();
+    }
+
+    loadElectrodes(){
+        for(var k in this.records){
+            var r = this.records[k];
+            console.log(r.filename);
+            this.electrodes.forEach((e) => {
+                r.electrode(e);
+            });
+        }
+    }
+
+    show(){
+        for(var k in this.records){
+            var r = this.records[k];
+            r.electrodes.forEach((e) => {
+                console.log(`${r.filename}\telectrode ${e.number}\t${e.min}\t${e.max}`);
+            });
+        }
+    }
+}
+
+export { Record, Experiment };
