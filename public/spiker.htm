@@ -16,15 +16,18 @@
     function loadRecords(){
         $.getJSON('/records', function (rs) {
             rs.forEach(r => {
-                $('#records').append(`<button onclick="loadRecord(this);">${r}</button>`);
+                $('#records').append(`<button onclick="loadRecord(this);">${r}</button> `);
             });
         });
     }
 
     function loadRecord(btn){
         var r = $(btn).html();
-        $.getJSON('/electrodes', (el) => {
-            $('#electrodes').append(`<button onclick="loadElectrode('${r}',this);">${el}</button>`);
+        $.getJSON('/electrodes', (els) => {
+            $('#electrodes').html('');
+            els.forEach(el => {
+                $('#electrodes').append(`<button onclick="loadElectrode('${r}',this);">${el}</button> `);
+            });
         });
     }
 
@@ -37,8 +40,8 @@
     function load(record,electrode){
         $.getJSON(`/${record}/${electrode}`, function (el) {
             console.log(el);
-            var data = el.data
-            var sample_rate = el.sample_rate;
+            var data = el.simplified_data
+            var sample_rate = el.s_sample_rate;
             var d = {x: data.map((x,index) => index / sample_rate), y: data.map(x => x), type: 'line' };
             layoutBlack.xaxis.title = 'time';
             layoutBlack.xaxis.ticksuffix = 's';
