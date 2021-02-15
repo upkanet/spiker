@@ -1,36 +1,20 @@
-import { Experiment } from './record.mjs';
-import express from 'express';
-const app = express();
+import { fineStructureDependencies } from 'mathjs';
+import { Electrode } from './record.mjs';
+import fs from 'fs';
 
-//var exp = new Experiment('data/20210129', [251, 97, 247]);
-var exp = new Experiment('data/test', [251]);
+var s = fs.readFileSync('data-test/sin.txt','utf-8');
 
-app.get('/', function (req, res) {
-    res.sendFile('spiker.htm', {root : 'public'});
+s = s.split('\r\n');
+var period = s[1].split('\t')[0] - s[0].split('\t')[0];
+var sample_rate = 1 / period;
+var e = new Electrode(1,sample_rate);
+console.log("Period", period);
+console.log("Sampling", sample_rate);
+s.forEach(l => {
+    l = l.split('\t');
+    e.push(Number(l[1]));
 });
 
-app.get('/favicon.ico', function (req, res) {
-    res.sendFile('favicon.ico', {root : '.'});
-});
+console.log(e.topFreq);
 
-app.get('/records', (req, res) => {
-    res.json(Object.keys(exp.records));
-});
-
-app.get('/electrodes', (req, res) => {
-    res.json(exp.electrodes);
-});
-
-app.get('/js/:js', function (req, res) {
-    res.sendFile(req.params.js, {root : 'js'});
-});
-
-app.get('/:record/:electrode', (req, res) => {
-    var r = req.params.record;
-    var e = req.params.electrode;
-    var el = exp.records[r].electrode(e);
-    res.json(el);
-});
-
-app.listen(3000)
 
