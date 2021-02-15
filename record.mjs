@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import BinaryParser from 'binary-buffer-parser';
 import { complex, pi, sin, cos, add, multiply } from 'mathjs';
+import { cpuUsage } from 'process';
 var config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 
 class Electrode {
@@ -175,7 +176,7 @@ class Record {
             console.log("Electrode", electrode);
             fileParser.seek(1875);
             var el = new Electrode(electrode, this.sample_rate);
-            while (!fileParser.eof()) {
+            while(fileParser.tell() < fileParser.size() - (this.channels * 2)){
                 for (var i = 0; i < this.channels; i++) {
                     if (i == electrode - 1) {
                         var v = fileParser.int16();

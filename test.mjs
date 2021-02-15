@@ -1,4 +1,4 @@
 import { Experiment } from './record.mjs';
 
-var exp = new Experiment('data',[250,15,17]);
+var exp = new Experiment('data/20210129',[251,97,247]);
 exp.show();
