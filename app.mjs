@@ -21,6 +21,10 @@ app.get('/electrodes', (req, res) => {
     res.json(exp.electrodes);
 });
 
+app.get('/results', (req, res) => {
+    res.json(exp.results);
+});
+
 app.get('/js/:js', function (req, res) {
     res.sendFile(req.params.js, {root : 'js'});
 });

@@ -75,19 +75,11 @@ class Electrode {
     }
 
     get max() {
-        var max = 0;
-        this.data.forEach((v) => {
-            if (v > max) max = v;
-        });
-        return max;
+        return Math.max(...this.tData);
     }
 
     get min() {
-        var min = 0;
-        this.data.forEach((v) => {
-            if (v < min) min = v;
-        });
-        return min;
+        return Math.min(...this.tData);
     }
 
     Xk(k) {
@@ -133,7 +125,7 @@ class Electrode {
         }
 
         var N = this.sData.length;
-        a = a.map(k => Math.round(k  / (2 * N / this.sample_rate) * 100) / 100)
+        a = a.map(k => Math.round(k  / (2 * N / this.s_sample_rate) * 100) / 100);
 
         return a;
     }
@@ -246,15 +238,18 @@ class Experiment {
         }
     }
 
-    show(){
+    get results(){
+        var a = [];
         console.log("Results");
         console.log("Filename\tElec\tVmin\tVmax\tFrequencies");
         for(var k in this.records){
             var r = this.records[k];
             r.electrodes.forEach((e) => {
                 console.log(`${r.filename}\tE${e.number}\t${e.min}\t${e.max}\t${e.topFreq.join(',')}`);
+                a.push([r.filename,e.number,e.min,e.max,e.topFreq]);
             });
         }
+        return a;
     }
 }
 
@@ -264,4 +259,4 @@ function updateConsole(txt){
     process.stdout.write('\x1b[36m'+txt+'\x1b[0m');
 }
 
-export { Record, Experiment };
+export { Electrode, Record, Experiment };
