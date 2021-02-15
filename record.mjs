@@ -8,7 +8,7 @@ class Electrode {
     constructor(number, sample_rate) {
         this.number = number;
         this.sample_rate = sample_rate;
-        this.tuncated = -1;
+        this.truncated = -1;
         this.simplified = false;
         this.spectrumed = false;
         this.data = [];
@@ -43,7 +43,7 @@ class Electrode {
                     this.truncated_data.push(e);
                 }
             });
-            this.tuncated = lastSeconds;
+            this.truncated = lastSeconds;
         }
         return this.truncated_data;
     }
