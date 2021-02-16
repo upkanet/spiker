@@ -103,6 +103,7 @@ class Electrode {
                 var magk = this.Xk(k).abs();
                 this.spectrum_data.push(magk);
             }
+            updateConsole(k+" / "+Math.round(N/2));
             process.stdout.write("\n");
             this.spectrumed = true;
         }
