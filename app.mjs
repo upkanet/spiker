@@ -2,8 +2,11 @@ import { Experiment } from './record.mjs';
 import express from 'express';
 const app = express();
 
-var exp = new Experiment('data/20210129', [251, 97, 247]);
-//var exp = new Experiment('data/test', [251]);
+var datapath = process.argv[2] || "data";
+var electrodes = process.argv[3] || "1";
+electrodes = electrodes.split(',');
+
+var exp = new Experiment(datapath, electrodes);
 
 app.get('/', function (req, res) {
     res.sendFile('spiker.htm', {root : 'public'});

@@ -149,7 +149,7 @@ class Record {
         fileParser.open(this.path);
 
         //Header
-        console.log("Analyzing header");
+        console.log("Analyzing header",this.filename);
         var header = fileParser.string0();
         this.startData = header.search('EOH') + 5;
         header = header.split('\n');
@@ -165,7 +165,7 @@ class Record {
 
         if (this.electrodes[electrode] === undefined) {
             //Data
-            console.log("Electrode", electrode);
+            console.log("# Electrode", electrode);
             fileParser.seek(this.startData);
             var el = new Electrode(electrode, this.sample_rate);
             while(!fileParser.eof()){
@@ -213,11 +213,11 @@ class Experiment {
         this.folderpath = folderpath;
         this.electrodes = electrodes;
         this.records = [];
+        console.log("Loading folder",folderpath,"with electrodes",electrodes);
         this.loadRecords();
     }
 
     loadRecords(){
-        console.log("Folder",this.folderpath);
         fs.readdirSync(this.folderpath).forEach((f) => {
             if(path.extname(f) == '.raw'){
                 var fpath = path.join(this.folderpath,f);
@@ -231,7 +231,7 @@ class Experiment {
     loadElectrodes(){
         for(var k in this.records){
             var r = this.records[k];
-            console.log(r.filename);
+            console.log("# Record",r.filename);
             this.electrodes.forEach((e) => {
                 r.electrode(e).spectrum;
             });
