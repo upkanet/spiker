@@ -1,24 +1,30 @@
-# spiker
+# Spiker by Axorus
 Multi Electrodes Array (MEA) records analyzer
 
-Install
+## Install
+Install NodeJS, then
 ```bash
 git clone https://github.com/upkanet/spiker.git
+cd spiker
 npm i
-
 ```
+## Prepare
+Convert .mcd file into .raw files with MC_DataTool :
+1. Open multiple mcd files you want to convert
+2. Click on *bin* button
+3. In *Electrode Raw Data* click on *All*
+4. Check *Write header* and *Signed 16bit*
+5. Choose path in with *Browse* button
+6. Click on *Save*, you will end up with .raw files about the same size of the original .mcd files
 
-Launch the server (Node with Modules >= v14.15.4)
+## Analyze
+
 ```bash
-node app.mjs mearecord.csv meamapping.csv
-
+node app.mjs path_to_raw_files_folder list_of_electrodes
 ```
-Fourier Transform server
-
+*for example*
 ```bash
-node ft.mjs file
-node ft.mjs #test with Sinus file
-
+node app.mjs data 251,9,17
 ```
 
-Then go to [http://localhost:8080/](http://localhost:8080/)
+Once the server is ready, go to [http://localhost:3000/](http://localhost:3000/)
