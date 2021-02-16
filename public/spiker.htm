@@ -9,38 +9,33 @@
         font-family: Arial, Helvetica, sans-serif;
         color: white;
     }
+
+    #data{
+        border: 1px solid white;
+    }
+
+    #data td{
+        width: 390px;
+        text-align: center;
+    }
+
+    #data tr:hover, tr.selected{
+        background-color: #1F1FAF;
+    }
+
+    #data thead{
+        font-weight: bold;
+        color: black;
+        background-color: white;
+    }
 </style>
 <script src="js/jquery3.5.1.min.js"></script>
 <script src="js/plotly-latest.min.js"></script>
 <script>
     var layoutBlack = { paper_bgcolor: 'black', plot_bgcolor: 'black', font: { color: 'white' }, xaxis: {'title': '', ticksuffix:'', spikemode: 'toaxis'}, yaxis: {spikemode: 'toaxis'}, hovermode: 'closest' };
     
-    function loadRecords(){
-        $.getJSON('/records', function (rs) {
-            rs.forEach(r => {
-                $('#records').append(`<button onclick="loadRecord(this);">${r}</button> `);
-            });
-        });
-    }
-
-    function loadRecord(btn){
-        var r = $(btn).html();
-        $.getJSON('/electrodes', (els) => {
-            $('#electrodes').html('');
-            els.forEach(el => {
-                $('#electrodes').append(`<button onclick="loadElectrode('${r}',this);">${el}</button> `);
-            });
-        });
-    }
-
-    function loadElectrode(r,btn){
-        var el = $(btn).html();
-        console.log(r,el);
-        $('#title').html(`${r} / Electrode #${el}`);
-        load(r,el);
-    }
-
     function load(record,electrode){
+        $('#title').html(`${record} / Electrode #${electrode}`);
         $.getJSON(`/${record}/${electrode}`, function (el) {
             console.log(el);
             var data = el.simplified_data
@@ -59,18 +54,21 @@
         });
     }
 
+    function toggleSel(tr){
+        $('.selected').removeClass('selected');
+        $(tr).toggleClass('selected');
+    }
+
     function results(){
-        var div = $('#data');
+        var div = $('#data tbody');
         div.html('');
         $.getJSON('/results', (r) => {
-            console.log(r);
             r.forEach(l => {
-                div.append(`${l[0]} - ${l[1]} - ${l[2]} - ${l[3]} - ${l[4][0]}Hz / ${l[4][1]}Hz / ${l[4][2]}Hz / ${l[4][3]}Hz<br>`);
+                div.append(`<tr onclick="load('${l[0]}','${l[1]}');toggleSel(this)"><td>${l[0]}</td><td>${l[1]}</td><td>${l[2]}</td><td>${l[3]}</td><td>${l[4][0]}Hz / ${l[4][1]}Hz / ${l[4][2]}Hz / ${l[4][3]}Hz</td></tr>`);
             });         
         });
     }
 
-    loadRecords();
     $(document).ready(()=>{
         results();
     });
@@ -78,12 +76,18 @@
 </script>
 
 <body>
-    <div id="records"></div>
-    <div id="electrodes"></div>
+    <table id="data">
+        <thead>
+            <tr>
+                <td>Filename</td><td>Elec</td><td>Vmin</td><td>Vmax</td><td>Frequencies</td>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
     <h3 id="title"></h3>
-    <div id="data"></div>
-    <div id="gElectrode" style="width:100%;height:45%;"></div>
-    <div id="gSpectrum" style="width:100%;height:45%;"></div>
+    <div id="gElectrode" style="width:100%;height:calc(50%-300px);"></div>
+    <div id="gSpectrum" style="width:100%;height:calc(50%-300px);"></div>
 </body>
 
 </html>
