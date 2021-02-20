@@ -41,6 +41,13 @@ app.get('/:record/:electrode', (req, res) => {
     res.json(el);
 });
 
+app.get('/:record/:electrode/indexFreqRatio', (req, res) => {
+    var r = req.params.record;
+    var e = req.params.electrode;
+    var el = exp.records[r].electrode(e);
+    res.json(el.indexFreqRatio);
+});
+
 app.listen(3000)
 console.log('Server ready on port 3000 after', Math.round((new Date() - t0)/1000), 'sec');
 open('http://localhost:3000');

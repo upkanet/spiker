@@ -125,10 +125,14 @@ class Electrode {
             a.push(kmax);
         }
 
-        var N = this.sData.length;
-        a = a.map(k => Math.round(k  / (2 * N / this.s_sample_rate) * 100) / 100);
+        a = a.map(k => Math.round(k  * this.indexFreqRatio * 100) / 100);
 
         return a;
+    }
+
+    get indexFreqRatio(){
+        var N = this.sData.length;
+        return this.s_sample_rate / N;
     }
 }
 

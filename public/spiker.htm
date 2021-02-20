@@ -47,11 +47,12 @@
             Plotly.newPlot('gElectrode', [d], layoutBlack);
             
             var spectrum_data = el.spectrum_data;
-            var N = data.length;
-            var ds = {x: spectrum_data.map((x,k) => k / (2 * N / sample_rate)), y: spectrum_data.map(x => x), type: 'line' };
-            layoutBlack.xaxis.title = 'frequency';
-            layoutBlack.xaxis.ticksuffix = 'Hz';
-            Plotly.newPlot('gSpectrum', [ds], layoutBlack);
+            $.getJSON(`/${record}/${electrode}/indexFreqRatio`, (ratio) => {
+                var ds = {x: spectrum_data.map((x,k) => Math.round(k * ratio * 100)/100), y: spectrum_data.map(x => x), type: 'line' };
+                layoutBlack.xaxis.title = 'frequency';
+                layoutBlack.xaxis.ticksuffix = 'Hz';
+                Plotly.newPlot('gSpectrum', [ds], layoutBlack);
+            });
         });
     }
 
