@@ -1,5 +1,3 @@
-import { fineStructureDependencies } from 'mathjs';
-import { Electrode } from './record.mjs';
 import fs from 'fs';
 
 var s = fs.readFileSync('data-test/sin.txt','utf-8');

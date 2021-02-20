@@ -150,7 +150,7 @@ class Record {
         fileParser.open(this.path);
 
         //Header
-        console.log("Analyzing header",this.filename);
+        console.log("Analyzing header from",this.filename);
         var header = fileParser.string0();
         this.startData = header.search('EOH') + 5;
         header = header.split('\n');
@@ -241,12 +241,9 @@ class Experiment {
 
     get results(){
         var a = [];
-        console.log("Results");
-        console.log("Filename\tElec\tVmin\tVmax\tFrequencies");
         for(var k in this.records){
             var r = this.records[k];
             r.electrodes.forEach((e) => {
-                console.log(`${r.filename}\tE${e.number}\t${e.min}\t${e.max}\t${e.topFreq.join(',')}`);
                 a.push([r.filename,e.number,e.min,e.max,e.topFreq]);
             });
         }
