@@ -7,6 +7,7 @@ Install NodeJS, then
 git clone https://github.com/upkanet/spiker.git
 cd spiker
 npm i
+cp config-template.json config.json
 ```
 ## Prepare
 Convert .mcd file into .raw files with MC_DataTool :
