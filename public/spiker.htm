@@ -71,6 +71,30 @@
         });
     }
 
+    function sortTable(col = 1){
+        var t = $('#data tbody')[0];
+        var rows,switching, shouldSwitch;
+        switching = true;
+        while(switching){
+            switching = false;
+            rows = t.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[col];
+                y = rows[i + 1].getElementsByTagName("TD")[col];
+                if(Number(x.innerHTML.toLowerCase())>Number(y.innerHTML.toLowerCase())){
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if(shouldSwitch){
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+
+    }
+
     $(document).ready(()=>{
         results();
     });
@@ -81,7 +105,7 @@
     <table id="data">
         <thead>
             <tr>
-                <td>Filename</td><td>Elec</td><td>Vmin</td><td>Vmax</td><td>Frequencies</td>
+                <td>Filename</td><td onclick="sortTable();">Elec〽️</td><td>Vmin</td><td>Vmax</td><td>Frequencies</td>
             </tr>
         </thead>
         <tbody>
