@@ -30,6 +30,12 @@ app.get('/results', (req, res) => {
     res.json(exp.results);
 });
 
+app.get('/results/dl', (req, res) => {
+    res.status(200)
+        .attachment(`spiker-results.csv`)
+        .send(exp.resultsCSV);
+});
+
 app.get('/js/:js', function (req, res) {
     res.sendFile(req.params.js, {root : 'js'});
 });

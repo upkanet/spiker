@@ -223,13 +223,16 @@ class Experiment {
     }
 
     loadRecords(){
+        var empty = true;
         fs.readdirSync(this.folderpath).forEach((f) => {
             if(path.extname(f) == '.raw'){
                 var fpath = path.join(this.folderpath,f);
                 var r = new Record(fpath);
                 this.records[r.filename] = r;
+                empty = false;
             }
         });
+        if(empty) console.log('!! No .raw file found.');
         this.loadElectrodes();
     }
 
@@ -252,6 +255,16 @@ class Experiment {
             });
         }
         return a;
+    }
+
+    get resultsCSV(){
+        var r = this.results;
+        var s = "Filename;Elec;Vmin;Vmax;Frequencies\n";
+        r.forEach((l)=>{
+            s+=`${l[0]};${l[1]};${l[2]};${l[3]};${l[4]}\n`;
+        });
+        return s;
+
     }
 }
 
