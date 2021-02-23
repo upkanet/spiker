@@ -121,12 +121,15 @@
             ctx.fillStyle="blue";
             var w = c.width;
             var h = c.height;
+            var tw = 2 //Seconds
+            var th = Math.round((data.length / sample_rate) / tw);
 
             data.forEach((v,k) => {
                 if(v > 0){
                     var t = k / sample_rate;
-                    var coordz = rasterPos(t);
-                    ctx.fillRect(coordz.x * w,coordz.y*h,2,20);
+                    var x = t%tw / tw;
+                    var y = Math.round(t/tw) / th;
+                    ctx.fillRect(x * w,y*h,2,20);
                 }
             })
         });
