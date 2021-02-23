@@ -2,7 +2,7 @@
 Multi Electrodes Array (MEA) records analyzer
 
 ## Install
-Install NodeJS, then
+Install NodeJS & Git, then
 ```bash
 git clone https://github.com/upkanet/spiker.git
 cd spiker
