@@ -222,13 +222,18 @@ class Experiment {
         this.loadRecords();
     }
 
+    save(){
+        var js = JSON.stringify(this);
+        console.log(js);
+    }
+
     loadRecords(){
         var empty = true;
         fs.readdirSync(this.folderpath).forEach((f) => {
             if(path.extname(f) == '.raw'){
                 var fpath = path.join(this.folderpath,f);
                 var r = new Record(fpath);
-                this.records[r.filename] = r;
+                this.records.push(r);
                 empty = false;
             }
         });
@@ -251,7 +256,7 @@ class Experiment {
         for(var k in this.records){
             var r = this.records[k];
             r.electrodes.forEach((e) => {
-                a.push([r.filename,e.number,e.min,e.max,e.topFreq]);
+                a.push([k,r.filename,e.number,e.min,e.max,e.topFreq]);
             });
         }
         return a;
@@ -261,7 +266,7 @@ class Experiment {
         var r = this.results;
         var s = "Filename;Elec;Vmin;Vmax;Frequencies\n";
         r.forEach((l)=>{
-            s+=`${l[0]};${l[1]};${l[2]};${l[3]};${l[4]}\n`;
+            s+=`${l[1]};${l[2]};${l[3]};${l[4]};${l[5]}\n`;
         });
         return s;
 

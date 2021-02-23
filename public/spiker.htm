@@ -39,8 +39,8 @@
 <script>
     var layoutBlack = { paper_bgcolor: 'black', plot_bgcolor: 'black', font: { color: 'white' }, xaxis: {'title': '', ticksuffix:'', spikemode: 'toaxis'}, yaxis: {spikemode: 'toaxis'}, hovermode: 'closest' };
     
-    function load(record,electrode){
-        $('#title').html(`${record} / Electrode #${electrode}`);
+    function load(record,filename,electrode){
+        $('#title').html(`${filename} / Electrode #${electrode}`);
         $.getJSON(`/${record}/${electrode}`, function (el) {
             console.log(el);
             var data = el.simplified_data
@@ -70,7 +70,7 @@
         div.html('');
         $.getJSON('/results', (r) => {
             r.forEach(l => {
-                div.append(`<tr onclick="load('${l[0]}','${l[1]}');toggleSel(this)"><td>${l[0]}</td><td>${l[1]}</td><td>${l[2]}</td><td>${l[3]}</td><td>${l[4][0]}Hz / ${l[4][1]}Hz / ${l[4][2]}Hz / ${l[4][3]}Hz</td></tr>`);
+                div.append(`<tr onclick="load('${l[0]}','${l[1]}','${l[2]}');toggleSel(this)"><td>${l[1]}</td><td>${l[2]}</td><td>${l[3]}</td><td>${l[4]}</td><td>${l[5][0]}Hz / ${l[5][1]}Hz / ${l[5][2]}Hz / ${l[5][3]}Hz</td></tr>`);
             });         
         });
     }
