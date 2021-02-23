@@ -294,7 +294,7 @@ class Experiment {
         this.electrodes = electrodes;
         this.records = [];
         console.log("Loading folder",folderpath,"with electrodes",electrodes);
-        if(!fs.existsSync(this.folderpath+'/spiker.json')){
+        if(!fs.existsSync(this.folderpath+'/spiker.json') || !config.cache){
             this.loadRecords();
             this.saveFile();
         }

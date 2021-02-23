@@ -1,7 +1,9 @@
 import { Experiment } from './record.mjs';
 import express from 'express';
 import open from 'open';
+import fs from 'fs';
 const app = express();
+var config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 
 var datapath = process.argv[2] || "data";
 var electrodes = process.argv[3] || "1";
@@ -56,5 +58,5 @@ app.get('/:record/:electrode/indexFreqRatio', (req, res) => {
 
 app.listen(3000)
 console.log('Server ready on port 3000 after', Math.round((new Date() - t0)/1000), 'sec');
-open('http://localhost:3000');
+if(config.open) open('http://localhost:3000');
 
