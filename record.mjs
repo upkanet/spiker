@@ -11,10 +11,14 @@ class Electrode {
         this.truncated = -1;
         this.simplified = false;
         this.spectrumed = false;
+        this.filtered = false;
+        this.spiked = false;
         this.data = [];
         this.truncated_data = [];
         this.simplified_data = [];
         this.spectrum_data = [];
+        this.filtered_data = [];
+        this.spike_data = [];
     }
 
     get tData(){
@@ -30,6 +34,16 @@ class Electrode {
     get spectrum(){
         this.FT();
         return this.spectrum_data;
+    }
+
+    get fData(){
+        this.filter();
+        return this.filtered_data;
+    }
+
+    get ssData(){
+        this.spikeSorter();
+        return this.spike_data;
     }
 
     truncate() {
@@ -68,6 +82,57 @@ class Electrode {
 
             this.simplified = true;
         }
+    }
+
+    filter(){
+        if(!this.filtered){
+            var fc = config.fc;
+            console.log("High Pass Filtering at ",fc,"Hz");
+            var rc = 1/(2*Math.PI*fc);
+            var dt = 1/this.sample_rate;
+            var alpha = rc / (rc + dt);
+            var yk,ykm1,xkm1;
+            
+            this.data.forEach((x,k)=>{
+                if(k==0){
+                    this.filtered_data.push(0);
+                }
+                else{
+                    ykm1 = this.filtered_data[k-1];
+                    xkm1 = this.data[k-1];
+                    yk = alpha * ( ykm1 + x - xkm1);
+                    this.filtered_data.push(yk);
+                }
+            });
+    
+            this.filtered = true;
+        }
+    }
+
+    spikeSorter(){
+        var threshold = config.threshold;
+        var avg = average(this.fData);
+        var stddev = average(this.fData);
+
+        this.fData.forEach((y,i)=>{
+            if(i>0){
+                var ym1 = this.fData[i-1];
+                if((ym1 <= (avg+stddev)) && (y > (avg+stddev))){
+                    //Asc front
+                    this.spike_data.push(1)
+                }
+                else if((ym1 >= (avg-stddev)) && (y < (avg-stddev))){
+                    //Desc front
+                    this.spike_data.push(1)
+                }
+                else{
+                    this.spike_data.push(0)
+                }
+            }
+            else{
+                this.spike_data.push(0)
+            }
+        });
     }
 
     push(v) {
@@ -112,21 +177,26 @@ class Electrode {
     get topFreq() {
         var a = [];
         var topFrequencies = config.top_frequencies;
-
+        
         while(a.length < topFrequencies){
-            var max = 0;
-            var kmax = 0;
-            this.spectrum.forEach((v,k) => {
-                if(v>max && !a.includes(k)){
-                    max = v;
-                    kmax = k;
-                }
-            });
-            a.push(kmax);
+            if(config.compute.includes("spectrum")){
+                var max = 0;
+                var kmax = 0;
+                this.spectrum.forEach((v,k) => {
+                    if(v>max && !a.includes(k)){
+                        max = v;
+                        kmax = k;
+                    }
+                });
+                a.push(kmax);
+            }
+            else{
+                a.push(0);
+            }
         }
-
-        a = a.map(k => Math.round(k  * this.indexFreqRatio * 100) / 100);
-
+    
+            a = a.map(k => Math.round(k  * this.indexFreqRatio * 100) / 100);
+            
         return a;
     }
 
@@ -271,7 +341,9 @@ class Experiment {
             var r = this.records[k];
             console.log("# Record",r.filename);
             this.electrodes.forEach((e) => {
-                r.electrode(e).spectrum;
+                console.log(config.compute.includes("spectrum"));
+                if(config.compute.includes("spectrum")) r.electrode(e).spectrum;
+                if(config.compute.includes("raster")) r.electrode(e).ssData;
             });
         }
     }
@@ -281,7 +353,7 @@ class Experiment {
         for(var k in this.records){
             var r = this.records[k];
             r.electrodes.forEach((e) => {
-                a.push([k,r.filename,e.number,e.min,e.max,e.topFreq]);
+                a.push([k,r.filename,e.number,e.min,e.max,e.topFreq || 0]);
             });
         }
         return a;
@@ -303,5 +375,32 @@ function updateConsole(txt){
     process.stdout.cursorTo(0);
     process.stdout.write('\x1b[36m'+txt+'\x1b[0m');
 }
+
+//Stat fonctions
+function standardDeviation(values){
+    var avg = average(values);
+    
+    var squareDiffs = values.map(function(value){
+      var diff = value - avg;
+      var sqrDiff = diff * diff;
+      return sqrDiff;
+    });
+    
+    var avgSquareDiff = average(squareDiffs);
+  
+    var stdDev = Math.sqrt(avgSquareDiff);
+    return stdDev;
+  }
+  
+  function average(data){
+    var sum = data.reduce(function(sum, value){
+      return sum + value;
+    }, 0);
+  
+    var avg = sum / data.length;
+    return avg;
+  }
+
+
 
 export { Electrode, Record, Experiment };
