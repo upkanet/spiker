@@ -150,18 +150,23 @@ class Record {
     }
 
     header() {
-        const fileParser = new BinaryParser();
-        fileParser.open(this.path);
-
-        //Header
-        console.log("Analyzing header from",this.filename);
-        var header = fileParser.string0();
-        this.startData = header.search('EOH') + 5;
-        header = header.split('\n');
-        this.sample_rate = Number(header[3].substr(14));
-        this.ADC_zero = Number(header[4].substr(11));
-        this.El = Number(header[5].substr(5, 6));
-        this.channels = header[6].split(';').length;
+        try{
+            const fileParser = new BinaryParser();
+            fileParser.open(this.path);
+    
+            //Header
+            console.log("Analyzing header from",this.filename);
+            var header = fileParser.string0();
+            this.startData = header.search('EOH') + 5;
+            header = header.split('\n');
+            this.sample_rate = Number(header[3].substr(14));
+            this.ADC_zero = Number(header[4].substr(11));
+            this.El = Number(header[5].substr(5, 6));
+            this.channels = header[6].split(';').length;
+        }
+        catch(e){
+            console.log("No header");
+        }
     }
 
     electrode(electrode = 1) {
@@ -219,12 +224,32 @@ class Experiment {
         this.electrodes = electrodes;
         this.records = [];
         console.log("Loading folder",folderpath,"with electrodes",electrodes);
-        this.loadRecords();
+        if(!fs.existsSync(this.folderpath+'/spiker.json')){
+            this.loadRecords();
+            this.saveFile();
+        }
+        else{
+            console.log("Load from spiker.json");
+            this.loadFile();
+        }
     }
 
-    save(){
+    saveFile(){
         var js = JSON.stringify(this);
-        console.log(js);
+        fs.writeFileSync(this.folderpath+'/spiker.json',js);
+    }
+
+    loadFile(){
+        var electrodes = [];
+        var js = JSON.parse(fs.readFileSync(this.folderpath+'/spiker.json','utf8'));
+        js.records.forEach((r)=>{
+            electrodes = [];
+            r.electrodes.forEach((e,n) => {
+                if(e !== null) electrodes[n] = Object.assign(new Electrode, e);
+            });
+            r.electrodes = electrodes;
+            this.records.push(Object.assign(new Record, r));
+        });
     }
 
     loadRecords(){
