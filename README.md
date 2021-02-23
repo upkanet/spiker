@@ -3,7 +3,10 @@ Multi Electrodes Array (MEA) records analyzer
 
 ## Install
 Install NodeJS & Git, then
+In Powershell (or any bash)
+(change my_app_folder by any place you want)
 ```bash
+cd my_apps_folder
 git clone https://github.com/upkanet/spiker.git
 cd spiker
 npm i
