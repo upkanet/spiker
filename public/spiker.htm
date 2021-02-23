@@ -60,6 +60,18 @@
         });
     }
 
+    function plotEdata(record,electrode,arrName,srateName,plotName,title,ticksuffix){
+        $.getJSON(`/${record}/${electrode}`, function (el) {
+            console.log(el);
+            var data = el[arrName];
+            var sample_rate = el[srateName];
+            var d = {x: data.map((x,index) => index / sample_rate), y: data.map(x => x), type: 'line' };
+            layoutBlack.xaxis.title = title;
+            layoutBlack.xaxis.ticksuffix = ticksuffix;
+            Plotly.newPlot(plotName, [d], layoutBlack);
+        });
+    }
+
     function toggleSel(tr){
         $('.selected').removeClass('selected');
         $(tr).toggleClass('selected');
@@ -119,6 +131,7 @@
     <h3 id="title"></h3>
     <div id="gElectrode" style="width:100%;height:calc(50%-300px);"></div>
     <div id="gSpectrum" style="width:100%;height:calc(50%-300px);"></div>
+    <div id="gPlot" style="width:100%;height:calc(50%-300px);"></div>
 </body>
 
 </html>

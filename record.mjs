@@ -110,18 +110,20 @@ class Electrode {
     }
 
     spikeSorter(){
-        var threshold = config.threshold;
+        var threshold = Math.abs(config.threshold);
         var avg = average(this.fData);
-        var stddev = average(this.fData);
+        var stddev = standardDeviation(this.fData);
+
+        console.log("Spiker Sorter",avg,stddev);
 
         this.fData.forEach((y,i)=>{
             if(i>0){
                 var ym1 = this.fData[i-1];
-                if((ym1 <= (avg+stddev)) && (y > (avg+stddev))){
+                if((ym1 <= (avg+stddev*threshold)) && (y > (avg+stddev*threshold))){
                     //Asc front
                     this.spike_data.push(1)
                 }
-                else if((ym1 >= (avg-stddev)) && (y < (avg-stddev))){
+                else if((ym1 >= (avg-stddev*threshold)) && (y < (avg-stddev*threshold))){
                     //Desc front
                     this.spike_data.push(1)
                 }
@@ -341,7 +343,6 @@ class Experiment {
             var r = this.records[k];
             console.log("# Record",r.filename);
             this.electrodes.forEach((e) => {
-                console.log(config.compute.includes("spectrum"));
                 if(config.compute.includes("spectrum")) r.electrode(e).spectrum;
                 if(config.compute.includes("raster")) r.electrode(e).ssData;
             });
