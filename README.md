@@ -12,6 +12,15 @@ cd spiker
 npm i
 cp config-template.json config.json
 ```
+*in plain english*
+```
+move into "my_apps_folder" (cd = change directory)
+copy git code to current folder
+move into "spiker" folder
+install all libraries using npm (node package manager)
+copy config-template.json to config.json, to use your own parameters without being erased after an update
+```
+
 ## Prepare
 Convert .mcd file into .raw files with MC_DataTool :
 1. Open multiple mcd files you want to convert
