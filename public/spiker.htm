@@ -111,6 +111,35 @@
 
     }
 
+    function raster(record,electrode){
+        $.getJSON(`/${record}/${electrode}`, function (el) {
+            console.log(el);
+            var data = el.spike_data;
+            var sample_rate = el.sample_rate;
+            var c = document.getElementById('canRaster');
+            var ctx = c.getContext('2d');
+            ctx.fillStyle="blue";
+            var w = c.width;
+            var h = c.height;
+
+            data.forEach((v,k) => {
+                if(v > 0){
+                    var t = k / sample_rate;
+                    var coordz = rasterPos(t);
+                    ctx.fillRect(coordz.x * w,coordz.y*h,2,20);
+                }
+            })
+        });
+    }
+
+    function rasterPos(t){
+        var w = 2; //seconds
+        var x = t%w / w;
+        var y = Math.round(t/w) / 35;
+        return {x:x,y:y};
+    }
+
+
     $(document).ready(()=>{
         results();
     });
@@ -132,6 +161,7 @@
     <div id="gElectrode" style="width:100%;height:calc(50%-300px);"></div>
     <div id="gSpectrum" style="width:100%;height:calc(50%-300px);"></div>
     <div id="gPlot" style="width:100%;height:calc(50%-300px);"></div>
+    <canvas id="canRaster" width="1024" height="768"></canvas>
 </body>
 
 </html>
