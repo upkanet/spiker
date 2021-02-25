@@ -302,6 +302,53 @@ class Record {
             if(fn == "spectrum") this.electrode(e).spectrum;
             if(fn == "raster") this.electrode(e).raster(this.path);
         });
+        if(fn == "heatmap") this.heatmap();
+    }
+
+    heatmap(){
+        for(var e = 1; e <= 256; e++){
+            if (this.electrodes[e] === undefined) {
+                this.electrode(e);
+            }
+        }
+        var w = config.raster.width;
+        var h = config.raster.height;
+
+        const canvas = Canvas.createCanvas(w, h);
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle="black";
+        ctx.fillRect(0,0,w,h);
+        
+        var mins = this.mins.slice();
+        mins.shift();
+        var supermin = Math.min(...mins);
+        console.log(Math.min(...mins));
+        this.mins.forEach((v,k) => {
+            var tx = v / supermin * 255;
+            ctx.fillStyle=`rgb(0,0,${tx})`;
+            var x = (k-1)%16 / 15;
+            var y = Math.floor((k-1)/16)/16;
+            ctx.fillRect(x * w,y*h,w/16,h/16);
+        });
+        canv2PNG(canvas, this.path, 'heatmap-min');
+
+        const canvas2 = Canvas.createCanvas(w, h);
+        const ctx2 = canvas2.getContext('2d');
+        ctx2.fillStyle="black";
+        ctx2.fillRect(0,0,w,h);
+        
+        var maxs = this.maxs.slice();
+        maxs.shift();
+        var supermax = Math.max(...maxs);
+        console.log(Math.max(...maxs));
+        this.maxs.forEach((v,k) => {
+            var tx = v / supermax * 255;
+            ctx2.fillStyle=`rgb(0,0,${tx})`;
+            var x = (k-1)%16 / 15;
+            var y = Math.floor((k-1)/16)/16;
+            ctx2.fillRect(x * w,y*h,w/16,h/16);
+        });
+        canv2PNG(canvas2, this.path, 'heatmap-max');
     }
 
     get mins(){
@@ -437,6 +484,15 @@ function standardDeviation(values){
     var avg = sum / data.length;
     return avg;
   }
+
+//Image
+function canv2PNG(canvas, fpath, imgname){
+    const ipath = path.dirname(fpath) + '\\' + path.basename(fpath).split('.')[0] + '-' + imgname + '.png';
+    const output = fs.createWriteStream(ipath);
+    const stream = canvas.createPNGStream();
+    stream.pipe(output);
+    output.on('finish', () =>  console.log('[PNG] ' + path.basename(ipath) + ' created'));
+}
 
 
 
