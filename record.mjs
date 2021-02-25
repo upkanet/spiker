@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import BinaryParser from 'binary-buffer-parser';
 import { complex, pi, sin, cos, add, multiply } from 'mathjs';
+import Canvas from 'canvas';
 var config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 
 class Electrode {
@@ -176,6 +177,35 @@ class Electrode {
         }
     }
 
+    raster(fpath){
+        var data = this.ssData;
+        var w = config.raster.width;
+        var h = config.raster.height;
+        var tw = config.raster.time;
+        var th = Math.round((data.length / this.sample_rate) / tw);
+
+        const canvas = Canvas.createCanvas(w, h);
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle="black";
+        ctx.fillRect(0,0,w,h);
+        ctx.fillStyle="blue";
+
+        data.forEach((v,k) => {
+            if(v > 0){
+                var t = k / this.sample_rate;
+                var x = t%tw / tw;
+                var y = Math.round(t/tw) / th;
+                ctx.fillRect(x * w,y*h,2,20);
+            }
+        });
+        
+        const ipath = path.dirname(fpath) + '\\' + path.basename(fpath).split('.')[0] + '-' + this.number + '.png';
+        const output = fs.createWriteStream(ipath);
+        const stream = canvas.createPNGStream();
+        stream.pipe(output);
+        output.on('finish', () =>  console.log(path.basename(ipath) + ' was created.'));
+    }
+
     get topFreq() {
         var a = [];
         var topFrequencies = config.top_frequencies;
@@ -270,7 +300,7 @@ class Record {
         this.selected_electrodes.forEach((e) => {
             console.log("Compute",fn,"for electrode #",e);
             if(fn == "spectrum") this.electrode(e).spectrum;
-            if(fn == "raster") this.electrode(e).ssData;
+            if(fn == "raster") this.electrode(e).raster(this.path);
         });
     }
 

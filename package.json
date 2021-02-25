@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "binary-buffer-parser": "^2.1.1",
+    "canvas": "^2.6.1",
     "express": "^4.17.1",
     "mathjs": "^8.1.1",
     "open": "^7.3.1"
