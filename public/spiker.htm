@@ -111,39 +111,6 @@
 
     }
 
-    function raster(record,electrode){
-        $.getJSON(`/${record}/${electrode}`, function (el) {
-            console.log(el);
-            var data = el.spike_data;
-            var sample_rate = el.sample_rate;
-            var c = document.getElementById('canRaster');
-            var ctx = c.getContext('2d');
-            ctx.fillStyle="blue";
-            var w = c.width;
-            var h = c.height;
-            ctx.clearRect(0,0,w,h);
-            var tw = 2 //Seconds
-            var th = Math.round((data.length / sample_rate) / tw);
-
-            data.forEach((v,k) => {
-                if(v > 0){
-                    var t = k / sample_rate;
-                    var x = t%tw / tw;
-                    var y = Math.round(t/tw) / th;
-                    ctx.fillRect(x * w,y*h,2,20);
-                }
-            })
-        });
-    }
-
-    function rasterPos(t){
-        var w = 2; //seconds
-        var x = t%w / w;
-        var y = Math.round(t/w) / 35;
-        return {x:x,y:y};
-    }
-
-
     $(document).ready(()=>{
         results();
     });
