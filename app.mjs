@@ -11,6 +11,7 @@ electrodes = electrodes.split(',');
 
 var t0 = new Date();
 var exp = new Experiment(datapath, electrodes);
+exp.compute("spectrum");
 
 app.get('/', function (req, res) {
     res.sendFile('spiker.htm', {root : 'public'});

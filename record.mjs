@@ -181,20 +181,15 @@ class Electrode {
         var topFrequencies = config.top_frequencies;
         
         while(a.length < topFrequencies){
-            if(config.compute.includes("spectrum")){
-                var max = 0;
-                var kmax = 0;
-                this.spectrum.forEach((v,k) => {
-                    if(v>max && !a.includes(k)){
-                        max = v;
-                        kmax = k;
-                    }
-                });
-                a.push(kmax);
-            }
-            else{
-                a.push(0);
-            }
+            var max = 0;
+            var kmax = 0;
+            this.spectrum.forEach((v,k) => {
+                if(v>max && !a.includes(k)){
+                    max = v;
+                    kmax = k;
+                }
+            });
+            a.push(kmax);
         }
     
             a = a.map(k => Math.round(k  * this.indexFreqRatio * 100) / 100);
@@ -217,6 +212,7 @@ class Record {
         this.El;
         this.channels = 0;
         this.electrodes = [];
+        this.selected_electrodes = [];
         this._spectrum = [];
         this.header();
     }
@@ -269,6 +265,15 @@ class Record {
         return this.electrodes[electrode];
     }
 
+    compute(fn){
+        console.log("# Record",this.filename," - Computing :",fn);
+        this.selected_electrodes.forEach((e) => {
+            console.log("Compute",fn,"for electrode #",e);
+            if(fn == "spectrum") this.electrode(e).spectrum;
+            if(fn == "raster") this.electrode(e).ssData;
+        });
+    }
+
     get mins(){
         var mins = [];
         this.electrodes.forEach((el) => {
@@ -296,14 +301,8 @@ class Experiment {
         this.electrodes = electrodes;
         this.records = [];
         console.log("Loading folder",folderpath,"with electrodes",electrodes);
-        if(!fs.existsSync(this.folderpath+'/spiker.json') || !config.cache){
-            this.loadRecords();
-            this.saveFile();
-        }
-        else{
-            console.log("Load from spiker.json");
-            this.loadFile();
-        }
+        this.loadRecords();
+        
     }
 
     saveFile(){
@@ -335,17 +334,24 @@ class Experiment {
             }
         });
         if(empty) console.log('!! No .raw file found.');
-        this.loadElectrodes();
     }
 
-    loadElectrodes(){
-        for(var k in this.records){
-            var r = this.records[k];
-            console.log("# Record",r.filename);
-            this.electrodes.forEach((e) => {
-                if(config.compute.includes("spectrum")) r.electrode(e).spectrum;
-                if(config.compute.includes("raster")) r.electrode(e).ssData;
-            });
+    computeRecords(fn){
+        this.records.forEach((r) => {
+            r.selected_electrodes = this.electrodes;
+            console.log("Selected Electrodes",r.selected_electrodes);
+            r.compute(fn);
+        });
+    }
+
+    compute(fn){
+        if(!fs.existsSync(this.folderpath+'/spiker.json') || !config.cache){
+            this.computeRecords(fn);
+            this.saveFile();
+        }
+        else{
+            console.log("Load from spiker.json");
+            this.loadFile();
         }
     }
 
