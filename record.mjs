@@ -305,14 +305,14 @@ class Experiment {
         
     }
 
-    saveFile(){
+    saveFile(fn){
         var js = JSON.stringify(this);
-        fs.writeFileSync(this.folderpath+'/spiker.json',js);
+        fs.writeFileSync(this.folderpath+`/spiker-${fn}.json`,js);
     }
 
-    loadFile(){
+    loadFile(fn){
         var electrodes = [];
-        var js = JSON.parse(fs.readFileSync(this.folderpath+'/spiker.json','utf8'));
+        var js = JSON.parse(fs.readFileSync(this.folderpath+`/spiker-${fn}.json`,'utf8'));
         js.records.forEach((r)=>{
             electrodes = [];
             r.electrodes.forEach((e,n) => {
@@ -345,13 +345,13 @@ class Experiment {
     }
 
     compute(fn){
-        if(!fs.existsSync(this.folderpath+'/spiker.json') || !config.cache){
+        if(!fs.existsSync(this.folderpath+`/spiker-${fn}.json`) || !config.cache){
             this.computeRecords(fn);
-            this.saveFile();
+            this.saveFile(fn);
         }
         else{
             console.log("Load from spiker.json");
-            this.loadFile();
+            this.loadFile(fn);
         }
     }
 
