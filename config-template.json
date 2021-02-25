@@ -1,9 +1,14 @@
 {
-    "open":false,
+    "open":true,
     "cache":true,
     "simplification_rate":12,
     "last_seconds":2,
     "top_frequencies":4,
     "fc":200,
-    "threshold":-4.2
+    "threshold":-4.2,
+    "raster": {
+        "width": 1024,
+        "height": 768,
+        "time": 2
+    }
 }
