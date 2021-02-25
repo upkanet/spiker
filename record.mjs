@@ -295,6 +295,27 @@ class Record {
         return this.electrodes[electrode];
     }
 
+    allElectrodes(){
+        const fileParser = new BinaryParser();
+        fileParser.open(this.path);
+        for(var e = 0; e < this.channels; e++){
+            this.electrodes.push(new Electrode(e, this.sample_rate));
+        }
+
+        //Data
+        fileParser.seek(this.startData);
+        while(!fileParser.eof()){
+            for (var i = 0; i < this.channels; i++) {
+                var v = fileParser.int16();
+                v = Math.round(v * this.El * 100) / 100;
+                this.electrodes[i].push(v);
+                if(fileParser.tell()%1000000 == 0) updateConsole(Math.round(fileParser.tell() / fileParser.size() * 100) + "%");
+            }
+        }
+        process.stdout.write("\n");
+        fileParser.close();
+    }
+
     compute(fn){
         console.log("# Record",this.filename," - Computing :",fn);
         this.selected_electrodes.forEach((e) => {
@@ -306,11 +327,8 @@ class Record {
     }
 
     heatmap(){
-        for(var e = 1; e <= 256; e++){
-            if (this.electrodes[e] === undefined) {
-                this.electrode(e);
-            }
-        }
+        this.allElectrodes();
+
         var w = config.raster.width;
         var h = config.raster.height;
 
@@ -427,7 +445,7 @@ class Experiment {
             this.saveFile(fn);
         }
         else{
-            console.log("Load from spiker.json");
+            console.log(`Load from spiker-${fn}.json`);
             this.loadFile(fn);
         }
     }
