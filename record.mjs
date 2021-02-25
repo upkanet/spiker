@@ -48,7 +48,7 @@ class Electrode {
     }
 
     truncate() {
-        var lastSeconds = config.last_seconds;
+        var lastSeconds = config.spectrum.last_seconds;
         if(this.truncated != lastSeconds){
             console.log("Keeping last ", lastSeconds, "sec. of Electrode", this.number);
             var lastSamples = lastSeconds * this.sample_rate;
@@ -65,7 +65,7 @@ class Electrode {
 
     simplify(){
         if(!this.simplified){
-            var pace = config.simplification_rate;
+            var pace = config.spectrum.simplification_rate;
             this.s_sample_rate = this.sample_rate / pace;
             if (pace > 1) {
                 var s = 0;
@@ -87,7 +87,7 @@ class Electrode {
 
     filter(){
         if(!this.filtered){
-            var fc = config.fc;
+            var fc = config.spike_sorter.fc;
             console.log("High Pass Filtering at ",fc,"Hz");
             var rc = 1/(2*Math.PI*fc);
             var dt = 1/this.sample_rate;
@@ -111,7 +111,7 @@ class Electrode {
     }
 
     spikeSorter(){
-        var threshold = Math.abs(config.threshold);
+        var threshold = Math.abs(config.spike_sorter.threshold);
         var avg = average(this.fData);
         var stddev = standardDeviation(this.fData);
 
@@ -203,12 +203,12 @@ class Electrode {
         const output = fs.createWriteStream(ipath);
         const stream = canvas.createPNGStream();
         stream.pipe(output);
-        output.on('finish', () =>  console.log(path.basename(ipath) + ' was created.'));
+        output.on('finish', () =>  console.log('[PNG] ' + path.basename(ipath) + ' created'));
     }
 
     get topFreq() {
         var a = [];
-        var topFrequencies = config.top_frequencies;
+        var topFrequencies = config.spectrum.top_frequencies;
         
         while(a.length < topFrequencies){
             var max = 0;

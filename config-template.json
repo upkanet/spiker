@@ -1,11 +1,15 @@
 {
     "open":true,
     "cache":true,
-    "simplification_rate":12,
-    "last_seconds":2,
-    "top_frequencies":4,
-    "fc":200,
-    "threshold":-4.2,
+    "spectrum":{
+        "simplification_rate":12,
+        "last_seconds":2,
+        "top_frequencies":4
+    },
+    "spike_sorter":{
+        "fc":200,
+        "threshold":-4.2
+    },
     "raster": {
         "width": 1024,
         "height": 768,
