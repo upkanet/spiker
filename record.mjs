@@ -327,7 +327,9 @@ class Record {
     }
 
     heatmap(){
-        this.allElectrodes();
+        if(this.electrodes.length < this.channels){
+            this.allElectrodes();
+        }
 
         var w = config.raster.width;
         var h = config.raster.height;
