@@ -14,7 +14,7 @@ var exp = new Experiment(datapath, electrodes);
 exp.compute("spectrum");
 
 app.get('/', function (req, res) {
-    res.sendFile('spiker.htm', {root : 'public'});
+    res.sendFile('spectrum.htm', {root : 'public'});
 });
 
 app.get('/favicon.ico', function (req, res) {
