@@ -244,6 +244,7 @@ class Record {
         this.electrodes = [];
         this.selected_electrodes = [];
         this._spectrum = [];
+        this.map_mea = config.map_mea.split(',').map(x => Number(x));
         this.header();
     }
 
@@ -316,6 +317,10 @@ class Record {
         fileParser.close();
     }
 
+    map(e){
+        return this.map_mea.indexOf(e);
+    }
+
     compute(fn){
         console.log("# Record",this.filename," - Computing :",fn);
         this.selected_electrodes.forEach((e) => {
@@ -343,7 +348,8 @@ class Record {
         mins.shift();
         var supermin = Math.min(...mins);
         console.log(Math.min(...mins));
-        this.mins.forEach((v,k) => {
+        this.mins.forEach((v,e) => {
+            var k = this.map(e);
             var tx = v / supermin * 255;
             ctx.fillStyle=`rgb(0,0,${tx})`;
             var x = (k-1)%16 / 15;
