@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import BinaryParser from 'binary-buffer-parser';
-import { complex, pi, sin, cos, add, multiply } from 'mathjs';
+import { complex, pi, sin, cos, add, multiply, maxTransformDependencies } from 'mathjs';
 import Canvas from 'canvas';
 var config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 
@@ -298,7 +298,7 @@ class Record {
     compute(fn){
         console.log("# Record",this.filename," - Computing :",fn);
         this.selected_electrodes.forEach((e) => {
-            console.log("Compute",fn,"for electrode #",e);
+            console.log("# Compute",fn,"for electrode #",e);
             if(fn == "spectrum") this.electrode(e).spectrum;
             if(fn == "raster") this.electrode(e).raster(this.path);
         });
@@ -326,7 +326,7 @@ class Record {
 }
 
 class Experiment {
-    constructor(folderpath, electrodes) {
+    constructor(folderpath, electrodes = []) {
         this.folderpath = folderpath;
         this.electrodes = electrodes;
         this.records = [];
