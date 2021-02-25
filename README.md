@@ -30,14 +30,24 @@ Convert .mcd file into .raw files with MC_DataTool :
 5. Choose path in with *Browse* button
 6. Click on *Save*, you will end up with .raw files about the same size of the original .mcd files
 
-## Analyze
+## Analyze Spectrum
 
 ```bash
-node app.mjs path_to_raw_files_folder list_of_electrodes
+node spectrum.mjs path_to_raw_files_folder list_of_electrodes
 ```
 *for example*
 ```bash
-node app.mjs data 251,9,17
+node spectrum.mjs data 251,9,17
 ```
-
 Once the server is ready, go to [http://localhost:3000/](http://localhost:3000/)
+
+## Generate Raster Plots
+
+```bash
+node raster.mjs path_to_raw_files_folder list_of_electrodes
+```
+*for example*
+```bash
+node raster.mjs data 251,9,17
+```
+It will generate images named *filename-electrode.png* in the same folder.
